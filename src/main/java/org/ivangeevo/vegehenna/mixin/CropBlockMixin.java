@@ -74,7 +74,9 @@ public abstract class CropBlockMixin extends PlantBlock implements Fertilizable,
     private void injectedGetOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
     {
         int age = this.getAge(state);
-        cir.setReturnValue(state.get(HAS_WEEDS) ? WEEDS_AGE_TO_SHAPE[age] : NEW_DEFAULT_AGE_TO_SHAPE[age]);
+        int weedsAge = this.getWeedsGrowthLevel((WorldAccess) world, pos);
+
+        cir.setReturnValue(state.get(HAS_WEEDS) ? WEEDS_AGE_TO_SHAPE[weedsAge] : NEW_DEFAULT_AGE_TO_SHAPE[age]);
         //cir.setReturnValue(NEW_DEFAULT_AGE_TO_SHAPE[age]);
     }
 
