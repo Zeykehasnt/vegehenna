@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 import org.ivangeevo.vegehenna.block.ModBlocks;
+import org.ivangeevo.vegehenna.data.ModDataComponents;
 import org.ivangeevo.vegehenna.entity.block.ModBlockEntities;
 import org.ivangeevo.vegehenna.item.ModItems;
 import org.ivangeevo.vegehenna.model.WeedsBlockModel;
@@ -30,6 +31,8 @@ public class VegehennaMod implements ModInitializer {
         ModBlocks.registerModBlocks();
         ModItems.registerModItems();
         VegehennaItemGroup.registerItemGroups();
+        ModDataComponents.registerComponents();
+
         //ModLootTableEvents.initialize();
 
         //CropGrowthHandler.register();
@@ -37,20 +40,5 @@ public class VegehennaMod implements ModInitializer {
         //ModelLoadingPlugin.register(new WeedsModelLoadingPlugin());
     }
 
-    static class WeedsModelLoadingPlugin implements ModelLoadingPlugin
-    {
-        public static final ModelIdentifier WEEDS_MODEL = new ModelIdentifier(Identifier.of("vegehenna", "weeds"), "");
 
-        @Override
-        public void onInitializeModelLoader(Context pluginContext) {
-            pluginContext.modifyModelOnLoad().register((original, context) -> {
-                final ModelIdentifier id = context.topLevelId();
-                if (id != null && id.equals(WEEDS_MODEL)) {
-                    return new WeedsBlockModel();
-                } else {
-                    return original;
-                }
-            });
-        }
-    }
 }

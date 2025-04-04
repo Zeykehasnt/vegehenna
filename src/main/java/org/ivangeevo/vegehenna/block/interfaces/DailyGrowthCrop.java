@@ -15,7 +15,7 @@ public interface DailyGrowthCrop extends CropBlockAdded {
 
     default void attemptToGrow(World world, BlockPos pos, BlockState state) {
         // Use CropBlockHelper for common growth logic
-        CropBlockHelper.handleCropGrowth(world, pos, state, world.getRandom(), (CropBlock)state.getBlock());
+        CropBlockHelper.handleDailyCropGrowth(world, pos, state, world.getRandom(), (CropBlock)state.getBlock());
     }
 
     /** The new default age-to-shape outline for crop blocks **/
