@@ -50,7 +50,7 @@ public abstract class CropBlockMixin extends PlantBlock implements Fertilizable,
         builder.add(HAS_WEEDS, WEEDS_LEVEL);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+    //@Inject(method = "<init>", at = @At("TAIL"))
     private void onInitWeeds(Settings settings, CallbackInfo ci) {
         this.setDefaultState(
                 this.getStateManager().getDefaultState()
@@ -74,7 +74,7 @@ public abstract class CropBlockMixin extends PlantBlock implements Fertilizable,
     private void injectedGetOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
     {
         int age = this.getAge(state);
-        int weedsAge = this.getWeedsGrowthLevel((WorldAccess) world, pos);
+        int weedsAge = world.getBlockState(pos).get(WEEDS_LEVEL);
 
         cir.setReturnValue(state.get(HAS_WEEDS) ? WEEDS_AGE_TO_SHAPE[weedsAge] : NEW_DEFAULT_AGE_TO_SHAPE[age]);
         //cir.setReturnValue(NEW_DEFAULT_AGE_TO_SHAPE[age]);
@@ -95,13 +95,14 @@ public abstract class CropBlockMixin extends PlantBlock implements Fertilizable,
     @Inject(method = "randomTick", at = @At("HEAD"))
     private void onRandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
         // Ensure we only apply to the bottom block of two-block tall crops
-        if (state.getBlock() instanceof CropBlock && state.contains(Properties.DOUBLE_BLOCK_HALF)) {
+        if (state.getBlock() instanceof CropBlock ) {
+
             // If it's the upper half of a two-block tall crop, do nothing
-            if (state.get(Properties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER) {
+            if (state.contains(Properties.DOUBLE_BLOCK_HALF) && state.get(Properties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER) {
                 return;
             }
 
-            // For the bottom block of a tall crop, apply weeds
+            // Apply weeds
             if (random.nextFloat() < 0.1f) {
                 world.setBlockState(pos, state.with(HAS_WEEDS, true).with(WEEDS_LEVEL, 0));
             }
@@ -111,7 +112,7 @@ public abstract class CropBlockMixin extends PlantBlock implements Fertilizable,
     @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
     private void slowGrowthWithWeeds(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
         BlockEntity entity = world.getBlockEntity(pos);
-        if (entity != null && entity.getComponents().contains(ModDataComponents.WEEDS_COMPONENT)) {
+        if (entity != null && entity.getAttachedOrThrow(ModDataComponents.HAS_WEEDS)) {
             if (random.nextFloat() < 0.3f) { // 70% chance to prevent growth
                 ci.cancel();
             }
